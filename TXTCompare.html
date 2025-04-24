@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Open Text Compare</title>
+	<style>
+		@keyframes flash {
+			0%   { background-color: #444488; }
+			100% { background-color: #2a2a3d; }
+		}
+
+		.result-flash {
+			animation: flash 0.3s ease-in-out;
+		}
+		.top-bar {
+			display: flex;
+			justify-content: flex-end;
+			margin-bottom: 10px;
+		}
+
+		#languageSelector {
+			padding: 5px;
+			font-size: 14px;
+			background-color: #2a2a3d;
+			color: #f0f0f0;
+			border: 1px solid #555;
+			border-radius: 5px;
+		}
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			margin: 0;
+			padding: 0;
+			background-color: #1e1e2f;
+			color: #f0f0f0;
+		}
+		h2 {
+			text-align: center;
+			color: #00ffff;
+			font-size: 2em;
+			margin-bottom: 20px;
+		}
+		.text-area-container {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 15px;
+		}
+		.text-box-wrapper {
+			display: flex;
+			flex-direction: column;
+			width: 49.5%;
+		}
+		.text-label {
+			margin: 0;
+			padding: 0;
+			font-weight: bold;
+			margin-bottom: 5px;
+			color: #00ffff;
+		}
+		textarea {
+			width: 100%;
+			height: 150px;
+			background-color: #2a2a3d;
+			color: #f0f0f0;
+			border: 1px solid #444;
+			padding: 10px;
+			font-family: monospace;
+			box-sizing: border-box;
+		}
+		.controls {
+			margin: 20px 0;
+			text-align: center;
+			background-color: #1e1e2f;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+			padding: 10px;
+		}
+		.nav-controls {
+			position: sticky;
+			top: 0;
+			background-color: #1e1e2f;
+			padding: 10px;
+			z-index: 1000;
+			text-align: center;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+		}
+		.diff {
+			max-height: 100vh; /* adjust depending on header+textareas height */
+			overflow-y: auto;
+			margin-top: 20px;
+			background-color: #2a2a3d;
+			padding: 10px;
+			border-radius: 8px;
+			font-family: monospace;
+		}
+		.line-number-same, .line-number-diff-add, .line-number-diff-del {
+			width: 40px;
+			text-align: right;
+		}
+		.line-number-same {
+			background-color: transparent;
+		}
+		.line-number-diff-add {
+			background-color: #294429;
+		}
+		.line-number-diff-del {
+			background-color: #442929;
+		}
+		.diff-row {
+			display: flex;
+			gap: 10px;
+			margin-bottom: 2px;
+		}
+		.diff-row-del{
+			background-color: #442929;
+		}
+		.diff-row-add{
+			background-color: #294429;
+		}
+		.diff-cell {
+			width: 40px;
+			text-align: right;
+		}
+		.diff-sign {
+			width: 20px;
+			text-align: center;
+		}
+		.diff-text {
+			flex-grow: 1;
+		}
+		.removed-text-highlight-on {
+			color: red;
+			font-weight: bold;
+			background-color: #f0a7a7;
+		}
+		.added-text-highlight-on{
+			color: green;
+			font-weight: bold;
+			background-color: #a7f0a7;
+		}
+		#compareButton {
+			padding: 10px 20px;
+			background-color: #00ffff;
+			border: none;
+			color: #1e1e2f;
+			cursor: pointer;
+			border-radius: 5px;
+			margin-top: 10px;
+			font-weight: bold;
+		}
+		/* Gray Buttons */
+		button {
+			background-color: #999999; /* Mid Gray */
+			color: #EEEEEE;
+			border: none;
+			padding: 10px 20px;
+			cursor: pointer;
+			transition: background-color 0.3s ease, transform 0.2s ease;
+			margin: 5px;
+			border-radius: 5px;
+		}
+		button:hover {
+			background-color: #666666; /* Darker Gray on hover */
+			transform: scale(1.05); /* Slightly enlarge on hover */
+		}
+
+		button:disabled {
+			background-color: transparent;
+			color: transparent;
+			cursor: not-allowed;
+			opacity: 0.5;
+		}
+		label {
+			margin: 0 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="top-bar">
+		<select id="languageSelector" onchange="changeLanguage()">
+		<option value="en">English</option>
+		<option value="es">Español</option>
+		<option value="pt">Português</option>
+		<!-- Add more languages as needed -->
+		</select>
+	</div>
+
+	<h2>Open Text Compare</h2>
+	<div class="text-area-container">
+		<div class="text-box-wrapper">
+			<label for="text1" class="text-label">Original</label>
+			<textarea id="text1" placeholder="Enter original text..."></textarea>
+		</div>
+		<div class="text-box-wrapper">
+			<label for="text2" class="text-label">Modified</label>
+			<textarea id="text2" placeholder="Enter modified text..."></textarea>
+		</div>
+	</div>
+	<div align="center">
+		<button id="switchText" onclick="switchText()">Switch Texts</button>
+	</div>
+	<div class="controls">
+		<label><input type="checkbox" id="highlightAdd" checked> <span id="labelAdd">Highlight Added Lines</span></label>
+		<label><input type="checkbox" id="highlightRemove" checked> <span id="labelRemove">Highlight Removed Lines</span></label>
+		<label><input type="checkbox" id="highlightWords"> <span id="labelWords">Highlight Words</span></label><br>
+		<button id="compareButton" onclick="compareText()">Compare</button>
+		<div id="compareStatus" style="text-align:center; color:#00ff99; font-weight:bold; margin-top:5px; font-family: monospace;"></div>
+	</div>
+	<div class="nav-controls">
+		<button onclick="goToPreviousChange()">&#8593; Previous Change</button>
+		<button onclick="goToNextChange()">&#8595; Next Change</button>
+	</div>
+
+	<div id="result" class="diff"></div>
+	
+	<div class="controls">
+		<button id="exportToEmail" onclick="exportToEmail()" disabled>Export to Email</button>
+		<button id="exportToTxt" onclick="exportToTxt()" disabled>Export to TXT</button>
+		<button id="exportToCsv" onclick="exportToCsv()" disabled>Export to CSV</button>
+		<button id="copyResults" onclick="copyResults()" disabled>Copy Results</button>
+	</div>
+	
+	<!-- Function: Comparison and Navigation -->
+	<script src="translations.js"></script>
+	<script>
+		let currentChangeIndex = -1;
+		document.getElementById('highlightAdd').addEventListener('change', updateHighlighting);
+		document.getElementById('highlightRemove').addEventListener('change', updateHighlighting);
+		document.getElementById('highlightWords').addEventListener('change', updateHighlighting);
+		
+		function updateHighlighting() {
+			const highlightAdd = document.getElementById('highlightAdd').checked;
+			const highlightRemove = document.getElementById('highlightRemove').checked;
+			const highlightWords = document.getElementById('highlightWords').checked;
+			
+			document.querySelectorAll('.diff-row-add').forEach(row => {
+				row.style.backgroundColor = highlightAdd ? '#294429' : 'transparent';
+			});
+
+			document.querySelectorAll('.diff-row-del').forEach(row => {
+				row.style.backgroundColor = highlightRemove ? '#442929' : 'transparent';
+			});
+			
+			document.querySelectorAll('.added-text-highlight-on, .added-text-highlight-off').forEach(word => {
+				word.className = highlightWords ? 'added-text-highlight-on' : 'added-text-highlight-off';
+			});
+			document.querySelectorAll('.removed-text-highlight-on, .removed-text-highlight-off').forEach(word => {
+				word.className = highlightWords ? 'removed-text-highlight-on' : 'removed-text-highlight-off';
+			});
+		}
+
+			function compareText() {
+				currentChangeIndex = -1;
+				const text1 = document.getElementById('text1').value;
+				const text2 = document.getElementById('text2').value;
+				
+				// Result Animation
+				const result = document.getElementById('result');
+				result.classList.remove('result-flash'); // restart animation
+				void result.offsetWidth; // trigger reflow
+				result.classList.add('result-flash');
+				// Message Animation
+				const status = document.getElementById('compareStatus');
+				status.textContent = 'Comparison updated!';
+				setTimeout(() => status.textContent = '', 2000);
+				
+				// Check the Text Boxes
+				if (!text1 && !text2) {
+					status.innerHTML = 'Both text boxes are empty.';
+					document.getElementById('result').innerHTML = '';
+					return;
+				}
+				if (!text1) {
+					status.innerHTML = 'The first text box is empty.';
+					document.getElementById('result').innerHTML = '';
+					return;
+				}
+				if (!text2) {
+					status.innerHTML = 'The second text box is empty.';
+					document.getElementById('result').innerHTML = '';
+					return;
+				}
+				if (text1 === text2) {
+					document.getElementById('result').innerHTML = '<div style="text-align:center; color:#00ff99; font-weight:bold; ">Identical Texts</div>';
+					return;
+				}
+				
+				// Proceed with comparison
+				compareByLine(text1, text2);
+				
+				// Enable the export buttons and the "Copy Results" button
+				document.getElementById('exportToEmail').disabled = false;
+				document.getElementById('exportToTxt').disabled = false;
+				document.getElementById('exportToCsv').disabled = false;
+				document.getElementById('copyResults').disabled = false;
+				
+				// Change the Compare button to "Re-Compare"
+				document.getElementById('compareButton').innerText = "Re-Compare";
+				
+			}
+		
+		function find(val, arr){
+			let i = 0;
+			while (i < arr.length){
+				if (val === arr[i]){
+					return i;
+				}
+				i++;
+			}
+			return -1;
+		}
+		
+		function compareByLine(text1, text2) {
+			const lines1 = text1.split(/\r?\n/);
+			const lines2 = text2.split(/\r?\n/);
+			let i = 0, j = 0;
+			let html = '';
+			let text1Flags = Array(lines1.length);
+			let text2Flags = Array(lines2.length);
+
+			while (i < lines1.length) {
+				const line1 = lines1[i];
+				const line2 = lines2[j];
+
+				if (line1 === line2) {
+					text1Flags[i] = '=';
+					text2Flags[j] = '=';
+					i++;
+					j++;
+				} else {
+					idx = find(line1, lines2.slice(j));
+					if (idx == -1){
+						text1Flags[i] = '-';
+						i++;
+					} else {
+						text1Flags[i] = '=';
+						text2Flags.fill('+', j, j+idx);
+						text2Flags[j+idx] = '=';
+						i++;
+						j = j+idx + 1;
+					}
+				}
+			}
+			if	(j < lines2.length){
+				text2Flags.fill('+', j, lines2.length);
+			}
+			
+			i = 0; j = 0, k = 0;
+			let flagEditSection = -1;
+			while (i < lines1.length || j < lines2.length){
+				const line1 = lines1[i];
+				const line2 = lines2[j];
+				
+				if (text1Flags[i] === '=' && text2Flags[j] === '='){
+					// No change, just display the line
+					html += `<div class="diff-row">
+							 <div class="diff-cell line-number-same">${i + 1}</div>
+							 <div class="diff-cell line-number-same">${j + 1}</div>
+							 <div class="diff-sign"></div>
+							 <div class="diff-text">${line1}</div>
+							 </div>`;
+					i++; j++; flagEditSection = -1;
+				}else if (text1Flags[i] === '-'){
+					if (text2Flags[j] === '+'){
+						// Line edited from text1
+						if (flagEditSection === -1){
+							flagEditSection = i;
+						}
+						html += `<div class="diff-row diff-row-del">
+										 <div class="diff-cell">${i + 1}</div>
+										 <div class="diff-cell"></div>
+										 <div class="diff-sign">-</div>
+										 <div class="diff-text">${compareWords(line1, lines2[j+i-flagEditSection], 'remove')}</div>
+									 </div>`;
+						i++;
+						
+						
+					}else{
+						// Line removed from text1
+						html += `<div class="diff-row diff-row-del">
+												 <div class="diff-cell">${i + 1}</div>
+												 <div class="diff-cell"></div>
+												 <div class="diff-sign">-</div>
+												 <div class="diff-text">${line1}</div>
+											 </div>`;
+						i++; flagEditSection = -1;
+					}
+				}else if (text2Flags[j] === '+'){
+					if (flagEditSection != -1){
+						// Line edited from text2
+						html += `<div class="diff-row diff-row-add">
+												 <div class="diff-cell"></div>
+												 <div class="diff-cell">${j + 1}</div>
+												 <div class="diff-sign">+</div>
+												<div class="diff-text">${compareWords(lines1[flagEditSection], line2, 'add')}</div>
+											</div>`;
+						flagEditSection++;						j++;						
+					}else{
+						// Line added in text2, highlight added words
+						html += `<div class="diff-row diff-row-add">
+												 <div class="diff-cell"></div>
+												 <div class="diff-cell">${j + 1}</div>
+												 <div class="diff-sign">+</div>
+												 <div class="diff-text">${line2}</div>
+											 </div>`;
+						j++;
+					}
+				}else {
+					console.log("Error undefined");
+				}
+			}
+			document.getElementById('result').innerHTML = html;
+		}
+		function compareWords(lineText1, lineText2, addOrRemove){
+			const words1 = lineText1.split(' ');
+			const words2 = lineText2.split(' ');
+			
+			let resultLine = '';
+			let i = 0, j = 0;
+			
+			// Processing text1
+			if (addOrRemove == 'remove'){
+				while (i < words1.length) {
+					
+					const word1 = words1[i];
+					
+					if (j >= words2.length){
+						resultLine += `<span class="removed-text-highlight-on">${word1}</span> `;
+						i++;
+						continue;
+					}
+					
+					const word2 = words2[j];
+					
+					if (word1 === word2){
+					// No change, just display the word
+						resultLine += `${word1} `;
+						i++;
+						j++;
+					}else{
+						idx = find(word1, words2.slice(j));
+						if (idx == -1){
+							// Removed Word
+							resultLine += `<span class="removed-text-highlight-on">${word1}</span> `;
+							i++;
+						}else{
+							// Moved Word
+							resultLine += `${word1} `;
+							i++;
+							j = j+idx + 1;
+						}
+					}
+				}
+			}else if(addOrRemove == 'add'){
+				while (j < words2.length) {
+					
+					const word2 = words2[j];
+					
+					if (i >= words1.length){
+						resultLine += `<span class="added-text-highlight-on">${word2}</span> `;
+						j++;
+						continue;
+					}
+					
+					const word1 = words1[i];
+					
+					if (word1 === word2){
+						// No change, just display the word
+						resultLine += `${word1} `;
+						i++;
+						j++;
+					}else{
+						idx = find(word2, words1.slice(i));
+						if (idx == -1){
+							// Added Word
+							resultLine += `<span class="added-text-highlight-on">${word2}</span> `;
+							j++;
+						}else{
+							// Moved Word
+							resultLine += `${word2} `;
+							i = i + idx + 1;
+							j++;
+						}
+					}
+				}
+			
+			}
+			return resultLine;
+			
+		}
+		function getChangeElements() {
+			return Array.from(document.querySelectorAll('.diff-row-add, .diff-row-del'));
+		}
+
+		function goToChange(offset) {
+			const changes = getChangeElements();
+			if (changes.length === 0) return;
+
+			currentChangeIndex = (currentChangeIndex + offset + changes.length) % changes.length;
+			const target = changes[currentChangeIndex];
+			target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+			// Optional: highlight it briefly
+			target.style.outline = '2px solid yellow';
+			setTimeout(() => target.style.outline = '', 1000);
+		}
+
+		function goToNextChange() {
+			goToChange(1);
+		}
+
+		function goToPreviousChange() {
+			goToChange(-1);
+		}
+	</script>
+	
+	<!-- Function: Page Languages Switch -->
+	<script>
+		function changeLanguage() {
+			const lang = document.getElementById('languageSelector').value;
+			const t = translations[lang];
+
+			document.querySelector('h2').textContent = t.title;
+			document.getElementById('labelAdd').textContent = t.highlightAdded;
+			document.getElementById('labelRemove').textContent = t.highlightRemoved;
+			document.getElementById('labelWords').textContent = t.highlightWords;
+			document.getElementById('compareButton').textContent = t.compareButton;
+			document.getElementById('text1').placeholder = t.text1Placeholder;
+			document.getElementById('text2').placeholder = t.text2Placeholder;
+		}
+	</script>
+	
+	<!-- Function: Page Scrolling -->
+	<script>
+		const diff = document.getElementById('result');
+
+		diff.addEventListener('wheel', function(e) {
+			const atTop = diff.scrollTop === 0;
+			const atBottom = diff.scrollHeight - diff.scrollTop === diff.clientHeight;
+
+			if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
+				// Allow scroll to bubble to parent (page)
+				e.preventDefault();
+				window.scrollBy(0, e.deltaY);
+			}
+		}, { passive: false });
+	</script>
+	
+	<!-- Function: Exports -->
+	<script>
+		function getPlainDiffText() {
+			const rows = document.querySelectorAll('#result .diff-row');
+			let output = '';
+			rows.forEach(row => {
+				const cells = row.querySelectorAll('div');
+				const line1 = cells[0]?.textContent.trim() || '';
+				const line2 = cells[1]?.textContent.trim() || '';
+				const sign = cells[2]?.textContent.trim() || '';
+				const text = cells[3]?.textContent || '';
+				output += `${line1}\t${line2}\t${sign}\t${text}\n`;
+			});
+			return output.trim();
+		}
+
+		function copyResults() {
+			const el = document.createElement('textarea');
+			el.value = getPlainDiffText();
+			document.body.appendChild(el);
+			el.select();
+			document.execCommand('copy');
+			document.body.removeChild(el);
+			alert('Results copied to clipboard!');
+		}
+
+		function exportToTxt() {
+			const blob = new Blob([getPlainDiffText()], { type: 'text/plain' });
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = 'comparison.txt';
+			a.click();
+		}
+
+		function exportToCsv() {
+			const lines = getPlainDiffText().split('\n');
+			const csvContent = lines.map(line => {
+				const cells = line.split('\t'); // Split by tab
+				if (cells.length >= 4) {
+					const [line1, line2, sign, text] = cells;
+					// If it's a removed line, the original line number might be empty (line1)
+					// We need to handle it and still process the line correctly
+					if (sign === '-' && !line1) {
+						return `,${line2},${sign},\"${text.replace(/\"/g, '\"\"')}\"`;
+					}
+					return `${line1},${line2},${sign},\"${text.replace(/\"/g, '\"\"')}\"`;
+				}
+				return ''; // Skip lines that don't contain enough cells
+			}).filter(line => line !== '').join('\n'); // Remove empty lines
+
+			// Create a CSV blob and trigger download
+			const blob = new Blob([csvContent], { type: 'text/csv' });
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = 'comparison.csv';
+			a.click();
+		}
+		function exportToEmail() {
+			const subject = encodeURIComponent('Text Comparison Result');
+			const body = encodeURIComponent(getPlainDiffText());
+			window.location.href = `mailto:?subject=${subject}&body=${body}`;
+		}
+	</script>
+	
+	<!-- Function: Switch Texts -->
+	<script>
+		function switchText() {
+		// Get the two text areas
+		const textArea1 = document.getElementById('text1');
+		const textArea2 = document.getElementById('text2');
+
+		// Store the current values in temporary variables
+		const tempText = textArea1.value;
+		
+		// Swap the values of the two text areas
+		textArea1.value = textArea2.value;
+		textArea2.value = tempText;
+	}
+	</script>
+</body>
+</html>
