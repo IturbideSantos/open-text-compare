@@ -26,7 +26,6 @@
 		.top-link {
 			color: #e0e0e0; /* Lighter gray for contrast */
 			text-decoration: none;
-			margin-left: 20px;
 			margin-right: 20px;
 			margin-top: 4px;
 			font-size: 0.95rem;
@@ -290,6 +289,7 @@
 </head>
 <body>
 	<div class="top-bar">
+		<a href="#" id="privacy-link" class="top-link">Privacy</a>
 		<a href="#" id="about-link" class="top-link">About</a>
 		<select id="languageSelector" onchange="changeLanguage()">
 		<option value="en">English</option>
@@ -344,10 +344,10 @@
 		</div>
 	</div>
 	
-	<div id="aboutModal" class="modal">
+	<div id="modal" class="modal">
 		<div class="modal-content">
-			<span class="close-button" onclick="toggleAboutModal()">&times;</span>
-			<div id="aboutModalContent">Loading...</div>
+			<span class="close-button" onclick="toggleModal()">&times;</span>
+			<div id="modalContent">Loading...</div>
 		</div>
 	</div>
 	<!-- Function: Comparison and Navigation -->
@@ -760,21 +760,26 @@
 	<script>
 		document.getElementById('about-link').addEventListener('click', (e) => {
 			e.preventDefault();
-			toggleAboutModal();
+			toggleModal('about.html');
 		});
-		function toggleAboutModal() {
-			const modal = document.getElementById('aboutModal');
-			const content = document.getElementById('aboutModalContent');
+		document.getElementById('privacy-link').addEventListener('click', (e) => {
+			e.preventDefault();
+			toggleModal('privacy.html');
+		});
+		function toggleModal(pageUrl) {
+			const modal = document.getElementById('modal');
+			const content = document.getElementById('modalContent');
 
+			// Toggle the modal display state
 			if (modal.style.display !== 'block') {
-				fetch('about.html')
+				fetch(pageUrl)
 					.then(response => response.text())
 					.then(html => {
 						content.innerHTML = html;
 						modal.style.display = 'block';
 					})
 					.catch(err => {
-						content.innerHTML = '<p>Error loading About page.</p>';
+						content.innerHTML = '<p>Error loading content.</p>';
 						modal.style.display = 'block';
 					});
 			} else {

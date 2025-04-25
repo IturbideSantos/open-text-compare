@@ -24,15 +24,12 @@ No installation. No sign-up. No data leaves your device.
 - ignore trailing white spaces
 - ignore space/tab differences
 - contacts (X, instagram, email)
-- about section/page where I talk about privacy
-- contribute with code
-	- read Me with instructions for pull request
 - create tests
-- implement a markdown parser to hold the about and privacy pages
 - improve colors and create a separate file to hold the different color themes
 - fix the languages: transpose all texts within the file to the translations.js
 - remove style-src 'unsafe-inline'
-
+- make texts of README, ABOUT and PRIVACY reusable. Maybe a tool to generate about and privacy pages automatically from the readme?
+	- implement a markdown parser to hold the about and privacy pages
 
 ## License
 
