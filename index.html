@@ -16,6 +16,23 @@
 			display: flex;
 			justify-content: flex-end;
 			margin-bottom: 10px;
+			padding: 10px;
+		}
+		.top-link {
+			color: #e0e0e0; /* Lighter gray for contrast */
+			text-decoration: none;
+			margin-left: 20px;
+			margin-right: 20px;
+			margin-top: 4px;
+			font-size: 0.95rem;
+			cursor: pointer;
+			display: inline-block;
+			vertical-align: middle;
+		}
+
+		.top-link:hover {
+			text-decoration: underline;
+			color: #ffffff;
 		}
 
 		#languageSelector {
@@ -204,10 +221,49 @@
 		.donate-btn.paypal:hover {
 			background-color: #ffb347;
 		}
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 999;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-content {
+			background-color: #fefefe;
+			margin: 10% auto;
+			padding: 20px;
+			border: 1px solid #888;
+			width: 90%;
+			max-width: 600px;
+			border-radius: 10px;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+			font-size: 16px;
+			line-height: 1.5;
+		}
+
+		.close-button {
+			color: #aaa;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+			cursor: pointer;
+		}
+
+		.close-button:hover,
+		.close-button:focus {
+			color: #000;
+			text-decoration: none;
+		}
 	</style>
 </head>
 <body>
 	<div class="top-bar">
+		<a href="#" id="about-link" class="top-link">About</a>
 		<select id="languageSelector" onchange="changeLanguage()">
 		<option value="en">English</option>
 		<option value="es">Español</option>
@@ -260,7 +316,10 @@
 			</a>
 		</div>
 	</div>
-
+	
+	<div id="aboutModal" style="display: none;">
+		<div id="aboutModalContent"></div>
+	</div>
 	<!-- Function: Comparison and Navigation -->
 	<script src="translations.js"></script>
 	<script>
@@ -665,6 +724,33 @@
 		textArea1.value = textArea2.value;
 		textArea2.value = tempText;
 	}
+	</script>
+	
+	<!-- About page -->
+	<script>
+		document.getElementById('about-link').addEventListener('click', (e) => {
+			e.preventDefault();
+			toggleAboutModal();
+		});
+		function toggleAboutModal() {
+			const modal = document.getElementById('aboutModal');
+			const content = document.getElementById('aboutModalContent');
+
+			if (modal.style.display !== 'block') {
+				fetch('about.html')
+					.then(response => response.text())
+					.then(html => {
+						content.innerHTML = html;
+						modal.style.display = 'block';
+					})
+					.catch(err => {
+						content.innerHTML = '<p>Error loading About page.</p>';
+						modal.style.display = 'block';
+					});
+			} else {
+				modal.style.display = 'none';
+			}
+		}
 	</script>
 </body>
 </html>
