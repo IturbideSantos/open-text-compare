@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'self' https://iturbidesantos.github.io;">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; 
+        style-src 'unsafe-inline' 'self'; 
+        img-src 'self' data:; 
+        connect-src 'self' https://iturbidesantos.github.io; 
+        script-src 'self' https://iturbidesantos.github.io 'unsafe-inline';">
 	<meta charset="UTF-8">
 	<title>Open Text Compare</title>
 	<style>
@@ -53,7 +57,7 @@
 		}
 		h2 {
 			text-align: center;
-			color: #00ffff;
+			color: #00dddd;
 			font-size: 2em;
 			margin-bottom: 20px;
 		}
@@ -72,7 +76,7 @@
 			padding: 0;
 			font-weight: bold;
 			margin-bottom: 5px;
-			color: #00ffff;
+			color: #00dddd;
 		}
 		textarea {
 			width: 100%;
@@ -156,7 +160,7 @@
 		}
 		#compareButton {
 			padding: 10px 20px;
-			background-color: #00ffff;
+			background-color: #00dddd;
 			border: none;
 			color: #1e1e2f;
 			cursor: pointer;
@@ -222,31 +226,53 @@
 		.donate-btn.paypal:hover {
 			background-color: #ffb347;
 		}
+		/* Modal Background */
 		.modal {
 			display: none;
-			position: fixed;
-			z-index: 999;
+			position: fixed; 
+			z-index: 2000; 
 			left: 0;
 			top: 0;
-			width: 100%;
-			height: 100%;
-			overflow: auto;
-			background-color: rgba(0, 0, 0, 0.4);
+			width: 100%; 
+			height: 100%; 
+			overflow: auto; 
+			background-color: rgba(0, 0, 0, 0.7);
 		}
 
+		/* Modal Content */
 		.modal-content {
-			background-color: #fefefe;
+			background-color: #202020;
 			margin: 10% auto;
-			padding: 20px;
-			border: 1px solid #888;
+			padding: 30px;
+			border: 2px solid #00dddd;
 			width: 90%;
 			max-width: 600px;
-			border-radius: 10px;
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-			font-size: 16px;
-			line-height: 1.5;
+			border-radius: 12px;
+			box-shadow: 0 6px 15px rgba(0, 188, 212, 0.3);
+			font-size: 18px;
+			line-height: 1.6;
+			color: #cccccc;
+			text-align: left;
+		}
+		.modal-content a {
+			color: #FF8A65; /* Soft peach-pink */
+			text-decoration: none;
+			font-weight: bold;
+			transition: color 0.3s ease, text-decoration 0.3s ease;
 		}
 
+		.modal-content a:hover {
+			color: #FF5722; /* Darker peach on hover */
+			text-decoration: underline;
+		}
+		.modal-content h1 {
+			color: #00dddd;
+		}
+		
+		.modal-content h3 {
+			color: #00dddd;
+		}
+		
 		.close-button {
 			color: #aaa;
 			float: right;
@@ -318,8 +344,11 @@
 		</div>
 	</div>
 	
-	<div id="aboutModal" style="display: none;">
-		<div id="aboutModalContent"></div>
+	<div id="aboutModal" class="modal">
+		<div class="modal-content">
+			<span class="close-button" onclick="toggleAboutModal()">&times;</span>
+			<div id="aboutModalContent">Loading...</div>
+		</div>
 	</div>
 	<!-- Function: Comparison and Navigation -->
 	<script src="translations.js"></script>
@@ -749,6 +778,13 @@
 						modal.style.display = 'block';
 					});
 			} else {
+				modal.style.display = 'none';
+			}
+		}
+		
+		window.onclick = function(event) {
+			const modal = document.getElementById('aboutModal');
+			if (event.target === modal) {
 				modal.style.display = 'none';
 			}
 		}
