@@ -316,7 +316,7 @@
 	<div class="controls">
 		<label><input type="checkbox" id="highlightAdd" checked> <span id="labelAdd">Highlight Added Lines</span></label>
 		<label><input type="checkbox" id="highlightRemove" checked> <span id="labelRemove">Highlight Removed Lines</span></label>
-		<label><input type="checkbox" id="highlightWords"> <span id="labelWords">Highlight Words</span></label><br>
+		<label><input type="checkbox" id="highlightWords" checked> <span id="labelWords">Highlight Words</span></label><br>
 		<button id="compareButton" onclick="compareText()">Compare</button>
 		<div id="compareStatus" style="text-align:center; color:#00ff99; font-weight:bold; margin-top:5px; font-family: monospace;"></div>
 	</div>
@@ -491,19 +491,29 @@
 							 </div>`;
 					i++; j++; flagEditSection = -1;
 				}else if (text1Flags[i] === '-'){
-					if (text2Flags[j] === '+' && j+i-flagEditSection < lines2.length){
+					if (text2Flags[j] === '+'){
 						// Line edited from text1
 						if (flagEditSection === -1){
 							flagEditSection = i;
 						}
-						html += `<div class="diff-row diff-row-del">
-										 <div class="diff-cell">${i + 1}</div>
-										 <div class="diff-cell"></div>
-										 <div class="diff-sign">-</div>
-										 <div class="diff-text">${compareWords(line1, lines2[j+i-flagEditSection], 'remove')}</div>
-									 </div>`;
-						i++;
-						
+						if (j+i-flagEditSection < lines2.length){
+							html += `<div class="diff-row diff-row-del">
+											 <div class="diff-cell">${i + 1}</div>
+											 <div class="diff-cell"></div>
+											 <div class="diff-sign">-</div>
+											 <div class="diff-text">${compareWords(line1, lines2[j+i-flagEditSection], 'remove')}</div>
+										 </div>`;
+							i++;
+						}else{
+							// Line removed from text1
+							html += `<div class="diff-row diff-row-del">
+													 <div class="diff-cell">${i + 1}</div>
+													 <div class="diff-cell"></div>
+													 <div class="diff-sign">-</div>
+													 <div class="diff-text">${line1}</div>
+												 </div>`;
+							i++;
+						}
 						
 					}else{
 						// Line removed from text1
