@@ -31,6 +31,7 @@ No installation. No sign-up. No data leaves your device.
 - implement a markdown parser to hold the about and privacy pages
 - improve colors and create a separate file to hold the different color themes
 - fix the languages: transpose all texts within the file to the translations.js
+- remove style-src 'unsafe-inline'
 
 
 ## License
