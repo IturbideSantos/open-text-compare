@@ -30,6 +30,8 @@ No installation. No sign-up. No data leaves your device.
 - remove style-src 'unsafe-inline'
 - make texts of README, ABOUT and PRIVACY reusable. Maybe a tool to generate about and privacy pages automatically from the readme?
 	- implement a markdown parser to hold the about and privacy pages
+- accept files
+- create a button to show results in two columns
 
 ## License
 
@@ -75,7 +77,7 @@ All pull requests must pass through rigorous testing before approval.
 
 ## Contact
 
-- Email: iturbide.12@gmail.com
+- Email: open.text.compare@gmail.com
 
 ## Disclaimer: Accuracy & Reliability
 This tool has been developed with care and thoroughly tested in a variety of scenarios. However, no software can guarantee perfect accuracy in all cases.
