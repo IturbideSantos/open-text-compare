@@ -20,18 +20,18 @@ No installation. No sign-up. No data leaves your device.
 
 ## Future Features
 
-- ignore white lines
 - ignore trailing white spaces
 - ignore space/tab differences
 - contacts (X, instagram, email)
 - create tests
 - improve colors and create a separate file to hold the different color themes
 - fix the languages: transpose all texts within the file to the translations.js
-- remove style-src 'unsafe-inline'
 - make texts of README, ABOUT and PRIVACY reusable. Maybe a tool to generate about and privacy pages automatically from the readme?
 	- implement a markdown parser to hold the about and privacy pages
 - accept files
 - create a button to show results in two columns
+- fix showing spaces and tabs
+- Add "How to use" page
 
 ## License
 
@@ -85,3 +85,20 @@ While this comparison tool works well for most use cases, you should always manu
 No warranty or guarantee is provided, and the author(s) of this project are not liable for any losses, damages, or misinterpretations that may result from the use of this tool.
 
 Use responsibly — and thank you for trusting this project!
+
+## Test
+In order to test it locally, I recommend using a CORS disabled version of your browser. Here's an example on how to open the chrome:
+- Windows
+`bash
+start chrome --disable-web-security --user-data-dir="C:\chrome_dev"
+`
+
+- Mac
+`bash
+open -na "Google Chrome" --args --disable-web-security --user-data-dir="/tmp/chrome_dev"
+`
+
+- Linux
+`bash
+google-chrome --disable-web-security --user-data-dir="/tmp/chrome_dev"
+`	

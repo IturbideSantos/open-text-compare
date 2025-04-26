@@ -48,7 +48,7 @@
 			border-radius: 5px;
 		}
 		body {
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			font-family: monospace;
 			margin: 0;
 			padding: 0;
 			background-color: #1e1e2f;
@@ -59,6 +59,7 @@
 			color: #00dddd;
 			font-size: 2em;
 			margin-bottom: 20px;
+			font-family: 'Consolas', 'Courier New', monospace;
 		}
 		.text-area-container {
 			display: flex;
@@ -86,14 +87,27 @@
 			padding: 10px;
 			font-family: monospace;
 			box-sizing: border-box;
+			resize:vertical;
 		}
 		.controls {
+			font-family: monospace;
 			margin: 20px 0;
 			text-align: center;
 			background-color: #1e1e2f;
 			box-shadow: 0 2px 10px rgba(0,0,0,0.4);
 			padding: 10px;
 		}
+		
+		.controls-highlight {
+			margin: 0;
+			text-align: center;
+			background-color: #1e1e2f;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+			padding: 10px;
+			display:none;
+			font-family: monospace;
+		}
+
 		.nav-controls {
 			position: sticky;
 			top: 0;
@@ -101,12 +115,12 @@
 			padding: 10px;
 			z-index: 1000;
 			text-align: center;
-			box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+			margin-bottom: 0;
 		}
 		.diff {
 			max-height: 100vh; /* adjust depending on header+textareas height */
 			overflow-y: auto;
-			margin-top: 20px;
+			margin-top: 0px;
 			background-color: #2a2a3d;
 			padding: 10px;
 			border-radius: 8px;
@@ -129,6 +143,7 @@
 			display: flex;
 			gap: 10px;
 			margin-bottom: 2px;
+			white-space: pre;
 		}
 		.diff-row-del{
 			background-color: #442929;
@@ -159,27 +174,30 @@
 		}
 		#compareButton {
 			padding: 10px 20px;
-			background-color: #00dddd;
+			background-color: #22dddd;
 			border: none;
-			color: #1e1e2f;
+			color: #004444;
 			cursor: pointer;
 			border-radius: 5px;
 			margin-top: 10px;
 			font-weight: bold;
+			font-family: 'Courier New', monospace;
+			font-size: 16px;
 		}
 		/* Gray Buttons */
 		button {
-			background-color: #999999; /* Mid Gray */
+			background-color: #606060;
 			color: #EEEEEE;
 			border: none;
-			padding: 10px 20px;
+			padding: 8px 16px;
 			cursor: pointer;
 			transition: background-color 0.3s ease, transform 0.2s ease;
 			margin: 5px;
 			border-radius: 5px;
+			font-family: monospace;
 		}
 		button:hover {
-			background-color: #666666; /* Darker Gray on hover */
+			background-color: #88BBBB; /* Darker Gray on hover */
 			transform: scale(1.05); /* Slightly enlarge on hover */
 		}
 
@@ -195,13 +213,21 @@
 		.donate-section {
 			text-align: center;
 			margin-top: 2rem;
-			padding: 1rem;
-			background-color: #f0f4f0;
+			padding: 0rem 1rem;
+			padding-bottom: 0.5rem;
+			background-color: #bfe9e9;
 			border-radius: 12px;
 			box-shadow: 0 0 10px rgba(0,0,0,0.05);
 			color: black;
 		}
-
+		.donate-section h3 {
+			margin-bottom: 0.25rem; /* Reduce space below the h3 */
+		}
+		.donate-section p {
+			margin: 0; /* Remove any default margin */
+			padding: 0; /* Remove any default padding */
+		}
+		
 		.donate-buttons {
 			display: flex;
 			justify-content: center;
@@ -305,18 +331,17 @@
 			<label for="text1" class="text-label">Original</label>
 			<textarea id="text1" placeholder="Enter original text..."></textarea>
 		</div>
+		<div style="align-self:center;">
+			<button id="switchText" onclick="switchText()" style="padding:3px;">&#8644;</button>
+		</div>
 		<div class="text-box-wrapper">
 			<label for="text2" class="text-label">Modified</label>
 			<textarea id="text2" placeholder="Enter modified text..."></textarea>
 		</div>
 	</div>
-	<div align="center">
-		<button id="switchText" onclick="switchText()">Switch Texts</button>
-	</div>
 	<div class="controls">
-		<label><input type="checkbox" id="highlightAdd" checked> <span id="labelAdd">Highlight Added Lines</span></label>
-		<label><input type="checkbox" id="highlightRemove" checked> <span id="labelRemove">Highlight Removed Lines</span></label>
-		<label><input type="checkbox" id="highlightWords" checked> <span id="labelWords">Highlight Words</span></label><br>
+		<label><input type="checkbox" id="ignoreTrailing" checked> <span id="labelWords">Ignore Trailing Characters</span></label>
+		<label><input type="checkbox" id="equalSpaceTab"> <span id="labelWords">Replace double Space/Tabs by single space</span></label><br>
 		<button id="compareButton" onclick="compareText()">Compare</button>
 		<div id="compareStatus" style="text-align:center; color:#00ff99; font-weight:bold; margin-top:5px; font-family: monospace;"></div>
 	</div>
@@ -324,7 +349,12 @@
 		<button onclick="goToPreviousChange()">&#8593; Previous Change</button>
 		<button onclick="goToNextChange()">&#8595; Next Change</button>
 	</div>
-
+	
+	<div class="controls-highlight">
+		<label><input type="checkbox" id="highlightAdd" checked> <span id="labelAdd">Highlight Added Lines</span></label>
+		<label><input type="checkbox" id="highlightRemove" checked> <span id="labelRemove">Highlight Removed Lines</span></label>
+		<label><input type="checkbox" id="highlightWords" checked> <span id="labelWords">Highlight Words</span></label><br>
+	</div>
 	<div id="result" class="diff"></div>
 	
 	<div class="controls">
@@ -335,7 +365,7 @@
 	</div>
 	
 	<div class="donate-section">
-		<h3>Support This Project 💚</h3>
+		<h3>Support This Project <span style="font-size: 25px; color: cyan; text-shadow: 0px 0px 15px rgba(0, 0, 0, 1);">&hearts;</span></h3>
 		<p>If you find this tool useful, consider supporting its development:</p>
 		<div class="donate-buttons">
 			<a href="https://www.paypal.com/donate?hosted_button_id=W7QPHFL9FQ62S" target="_blank" class="donate-btn paypal">
@@ -427,6 +457,9 @@
 			// Change the Compare button to "Re-Compare"
 			document.getElementById('compareButton').innerText = "Re-Compare";
 			
+			// Enable controls-highlight
+			document.querySelector('.controls-highlight').style.display = 'block';
+			
 		}
 		
 		function find(val, arr){
@@ -449,8 +482,12 @@
 			let text2Flags = Array(lines2.length);
 
 			while (i < lines1.length) {
-				const line1 = lines1[i];
-				const line2 = lines2[j];
+				const ignoreTrailing = document.getElementById('ignoreTrailing').checked;
+				let line1 = ignoreTrailing && lines1[i] ? lines1[i].trim() : lines1[i];
+				let line2 = ignoreTrailing && lines2[j] ? lines2[j].trim() : lines2[j];
+				
+				line1 = equalSpaceTab && lines1[i] ? line1.replace(/\s+/g, ' ') : line1;
+				line2 = equalSpaceTab && lines2[j] ? line2.replace(/\s+/g, ' ') : line2;
 
 				if (line1 === line2) {
 					text1Flags[i] = '=';
@@ -478,8 +515,14 @@
 			i = 0; j = 0, k = 0;
 			let flagEditSection = -1;
 			while (i < lines1.length || j < lines2.length){
-				const line1 = lines1[i];
-				const line2 = lines2[j];
+				const ignoreTrailing = document.getElementById('ignoreTrailing').checked;
+				const equalSpaceTab = document.getElementById('equalSpaceTab').checked;
+				
+				let line1 = ignoreTrailing && lines1[i] ? lines1[i].trim() : lines1[i];
+				let line2 = ignoreTrailing && lines2[j] ? lines2[j].trim() : lines2[j];
+				
+				line1 = equalSpaceTab && lines1[i] ? line1.replace(/\s+/g, ' ') : line1;
+				line2 = equalSpaceTab && lines2[j] ? line2.replace(/\s+/g, ' ') : line2;
 				
 				if (text1Flags[i] === '=' && text2Flags[j] === '='){
 					// No change, just display the line
@@ -552,8 +595,8 @@
 			document.getElementById('result').innerHTML = html;
 		}
 		function compareWords(lineText1, lineText2, addOrRemove){
-			const words1 = lineText1.split(' ');
-			const words2 = lineText2.split(' ');
+			const words1 = lineText1.match(/[^\s]+| |\t/g) || [];
+			const words2 = lineText2.match(/[^\s]+| |\t/g) || [];
 			
 			let resultLine = '';
 			let i = 0, j = 0;
@@ -565,7 +608,7 @@
 					const word1 = words1[i];
 					
 					if (j >= words2.length){
-						resultLine += `<span class="removed-text-highlight-on">${word1}</span> `;
+						resultLine += `<span class="removed-text-highlight-on">${word1}</span>`;
 						i++;
 						continue;
 					}
@@ -574,18 +617,18 @@
 					
 					if (word1 === word2){
 					// No change, just display the word
-						resultLine += `${word1} `;
+						resultLine += `${word1}`;
 						i++;
 						j++;
 					}else{
 						idx = find(word1, words2.slice(j));
 						if (idx == -1){
 							// Removed Word
-							resultLine += `<span class="removed-text-highlight-on">${word1}</span> `;
+							resultLine += `<span class="removed-text-highlight-on">${word1}</span>`;
 							i++;
 						}else{
 							// Moved Word
-							resultLine += `${word1} `;
+							resultLine += `${word1}`;
 							i++;
 							j = j+idx + 1;
 						}
@@ -597,7 +640,7 @@
 					const word2 = words2[j];
 					
 					if (i >= words1.length){
-						resultLine += `<span class="added-text-highlight-on">${word2}</span> `;
+						resultLine += `<span class="added-text-highlight-on">${word2}</span>`;
 						j++;
 						continue;
 					}
@@ -606,18 +649,18 @@
 					
 					if (word1 === word2){
 						// No change, just display the word
-						resultLine += `${word1} `;
+						resultLine += `${word1}`;
 						i++;
 						j++;
 					}else{
 						idx = find(word2, words1.slice(i));
 						if (idx == -1){
 							// Added Word
-							resultLine += `<span class="added-text-highlight-on">${word2}</span> `;
+							resultLine += `<span class="added-text-highlight-on">${word2}</span>`;
 							j++;
 						}else{
 							// Moved Word
-							resultLine += `${word2} `;
+							resultLine += `${word2}`;
 							i = i + idx + 1;
 							j++;
 						}
@@ -640,7 +683,7 @@
 			const target = changes[currentChangeIndex];
 			target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-			// Optional: highlight it briefly
+			// Highlight it briefly
 			target.style.outline = '2px solid yellow';
 			setTimeout(() => target.style.outline = '', 1000);
 		}
@@ -798,7 +841,7 @@
 		}
 		
 		window.onclick = function(event) {
-			const modal = document.getElementById('aboutModal');
+			const modal = document.getElementById('modal');
 			if (event.target === modal) {
 				modal.style.display = 'none';
 			}
