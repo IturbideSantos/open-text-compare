@@ -215,7 +215,7 @@
 			margin-top: 2rem;
 			padding: 0rem 1rem;
 			padding-bottom: 0.5rem;
-			background-color: #bfe9e9;
+			background-color: #ffffff;
 			border-radius: 12px;
 			box-shadow: 0 0 10px rgba(0,0,0,0.05);
 			color: black;
@@ -340,7 +340,7 @@
 		</div>
 	</div>
 	<div class="controls">
-		<label><input type="checkbox" id="ignoreTrailing" checked> <span id="labelWords">Ignore Trailing Characters</span></label>
+		<label><input type="checkbox" id="ignoreTrailing" checked> <span id="labelWords">Remove Trailing Characters</span></label>
 		<label><input type="checkbox" id="equalSpaceTab"> <span id="labelWords">Replace double Space/Tabs by single space</span></label><br>
 		<button id="compareButton" onclick="compareText()">Compare</button>
 		<div id="compareStatus" style="text-align:center; color:#00ff99; font-weight:bold; margin-top:5px; font-family: monospace;"></div>
@@ -474,20 +474,28 @@
 		}
 		
 		function compareByLine(text1, text2) {
-			const lines1 = text1.split(/\r?\n/);
-			const lines2 = text2.split(/\r?\n/);
+			const ignoreTrailing = document.getElementById('ignoreTrailing').checked;
+			const equalSpaceTab = document.getElementById('equalSpaceTab').checked;
+			
+			let lines1 = text1.split(/\r?\n/);
+			let lines2 = text2.split(/\r?\n/);
+			
+			
+			lines1 = ignoreTrailing ? lines1.map(line => line.trim()) : lines1;
+			lines1 = equalSpaceTab ? lines1.map(line => line.replace(/\s+/g, ' ')) : lines1;
+			
+			lines2 = ignoreTrailing ? lines2.map(line => line.trim()) : lines2;
+			lines2 = equalSpaceTab ? lines2.map(line => line.replace(/\s+/g, ' ')) : lines2;
+			
 			let i = 0, j = 0;
 			let html = '';
 			let text1Flags = Array(lines1.length);
 			let text2Flags = Array(lines2.length);
 
 			while (i < lines1.length) {
-				const ignoreTrailing = document.getElementById('ignoreTrailing').checked;
-				let line1 = ignoreTrailing && lines1[i] ? lines1[i].trim() : lines1[i];
-				let line2 = ignoreTrailing && lines2[j] ? lines2[j].trim() : lines2[j];
 				
-				line1 = equalSpaceTab && lines1[i] ? line1.replace(/\s+/g, ' ') : line1;
-				line2 = equalSpaceTab && lines2[j] ? line2.replace(/\s+/g, ' ') : line2;
+				const line1 = lines1[i];
+				const line2 = lines2[j];
 
 				if (line1 === line2) {
 					text1Flags[i] = '=';
@@ -515,8 +523,6 @@
 			i = 0; j = 0, k = 0;
 			let flagEditSection = -1;
 			while (i < lines1.length || j < lines2.length){
-				const ignoreTrailing = document.getElementById('ignoreTrailing').checked;
-				const equalSpaceTab = document.getElementById('equalSpaceTab').checked;
 				
 				let line1 = ignoreTrailing && lines1[i] ? lines1[i].trim() : lines1[i];
 				let line2 = ignoreTrailing && lines2[j] ? lines2[j].trim() : lines2[j];
