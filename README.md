@@ -20,8 +20,6 @@ No installation. No sign-up. No data leaves your device.
 
 ## Future Features
 
-- ignore trailing white spaces
-- ignore space/tab differences
 - contacts (X, instagram, email)
 - create tests
 - improve colors and create a separate file to hold the different color themes
@@ -30,7 +28,6 @@ No installation. No sign-up. No data leaves your device.
 	- implement a markdown parser to hold the about and privacy pages
 - accept files
 - create a button to show results in two columns
-- fix showing spaces and tabs
 - Add "How to use" page
 
 ## License

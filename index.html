@@ -328,16 +328,16 @@
 	<h2>Open Text Compare</h2>
 	<p align="center" style="padding:0; margin-top:0;"><a href="#" id="privacy-link-moto" class="top-link" style="padding:0; margin-top:0; margin-bottom:20px; margin:0">Your Data Stays with You</a></p>
 	<div class="text-area-container">
-		<div class="text-box-wrapper">
+		<div class="text-box-wrapper" id="area-text1">
 			<label for="text1" class="text-label">Original</label>
-			<textarea id="text1" placeholder="Enter original text..."></textarea>
+			<textarea id="text1" placeholder="Enter original text or drag and drop a text file..."></textarea>
 		</div>
 		<div style="align-self:center;">
 			<button id="switchText" onclick="switchText()" style="padding:3px;">&#8644;</button>
 		</div>
-		<div class="text-box-wrapper">
+		<div class="text-box-wrapper"  id="area-text2">
 			<label for="text2" class="text-label">Modified</label>
-			<textarea id="text2" placeholder="Enter modified text..."></textarea>
+			<textarea id="text2" placeholder="Enter modified text or drag and drop a text file..."></textarea>
 		</div>
 	</div>
 	<div class="controls">
@@ -857,6 +857,41 @@
 				modal.style.display = 'none';
 			}
 		}
+	</script>
+	
+	<!-- Handle the dragover and drop events -->
+	<script>
+		function handleDragOver(event) {
+		  event.preventDefault(); // Necessary to allow dropping
+		}
+
+		// Function to handle the drop event
+		function handleDrop(event, textareaId) {
+		  event.preventDefault();
+		  const file = event.dataTransfer.files[0]; // Get the first file (assuming one file is dropped)
+
+		  if (file && file.type.startsWith('text/')) { // Check if the file is a text file
+			const reader = new FileReader();
+			reader.onload = function(e) {
+			  // Set the content of the textarea to the file's content
+			  document.getElementById(textareaId).value = e.target.result;
+			};
+			reader.readAsText(file); // Read the text file
+		  } else {
+			alert('Please drop a valid text file (e.g., .txt, .html, .csv).');
+		  }
+		}
+
+		// Add event listeners to the drop areas
+		document.getElementById('area-text1').addEventListener('dragover', handleDragOver);
+		document.getElementById('area-text1').addEventListener('drop', function(event) {
+		  handleDrop(event, 'text1');
+		});
+
+		document.getElementById('area-text2').addEventListener('dragover', handleDragOver);
+		document.getElementById('area-text2').addEventListener('drop', function(event) {
+		  handleDrop(event, 'text2');
+		});
 	</script>
 </body>
 </html>
