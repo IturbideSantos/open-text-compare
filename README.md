@@ -22,13 +22,13 @@ No installation. No sign-up. No data leaves your device.
 
 - contacts (X, instagram, email)
 - create tests
-- improve colors and create a separate file to hold the different color themes
+- create a separate file to hold the different color themes
 - fix the languages: transpose all texts within the file to the translations.js
 - make texts of README, ABOUT and PRIVACY reusable. Maybe a tool to generate about and privacy pages automatically from the readme?
 	- implement a markdown parser to hold the about and privacy pages
-- accept files
 - create a button to show results in two columns
 - Add "How to use" page
+- fix double space/tab compare
 
 ## License
 
