@@ -58,6 +58,8 @@ Anyone is welcome to inspect, contribute to, or modify the code.
 
 You can trust exactly what this app does — because you can see it for yourself.
 
+Just access the [github repository](https://github.com/IturbideSantos/open-text-compare/)
+
 ## Support the Project 💚
 
 If this project helps you, consider donating:
