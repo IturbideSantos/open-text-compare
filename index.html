@@ -58,7 +58,7 @@
 			text-align: center;
 			color: #00dddd;
 			font-size: 2em;
-			margin-bottom: 20px;
+			margin-bottom: 0px;
 			font-family: 'Consolas', 'Courier New', monospace;
 		}
 		.text-area-container {
@@ -326,6 +326,7 @@
 	</div>
 
 	<h2>Open Text Compare</h2>
+	<p align="center" style="padding:0; margin-top:0;"><a href="#" id="privacy-link-moto" class="top-link" style="padding:0; margin-top:0; margin-bottom:20px; margin:0">Your Data Stays with You</a></p>
 	<div class="text-area-container">
 		<div class="text-box-wrapper">
 			<label for="text1" class="text-label">Original</label>
@@ -822,6 +823,10 @@
 			toggleModal('about.html');
 		});
 		document.getElementById('privacy-link').addEventListener('click', (e) => {
+			e.preventDefault();
+			toggleModal('privacy.html');
+		});
+		document.getElementById('privacy-link-moto').addEventListener('click', (e) => {
 			e.preventDefault();
 			toggleModal('privacy.html');
 		});
